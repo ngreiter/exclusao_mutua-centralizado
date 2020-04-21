@@ -7,152 +7,110 @@ import java.util.TimerTask;
 
 public class Controller {
 
-	private List<Processo> processos = new ArrayList<>();
+	private List<Processo> processos = new ArrayList<Processo>();
+	private List<Processo> fila = new ArrayList<Processo>();
+	private Recurso recurso = new Recurso();
+
+	private Processo coordenador = new Processo(1, true);
+	private int indexCoordenador = 0;
+
+	private int TEMPO_EXECUCAO_TOTAL = 600;
+	private int TEMPO_EXECUTANDO = 0;
 	private String mensagem = "";
 
-	private int idCount = 0;
-	private int timeCount = 0;
-	private int idCoordenador = 0;
-
-	private int TEMPO_EXECUCAO = 600;
-
 	private Timer timer = new Timer();
+	private NumeroAleatorio numeroAleatorio = new NumeroAleatorio();
 
 	public Controller() {
 		// Auto-generated constructor stub
 	}
 
 	public void start() {
-		criaProcesso(30000); // 30s
-		inativarCoordenador(100000); // 100s
-		inativarProcessoAleatorio(80000); // 80s
-		enviaRequisicao(25000); // 25s
+		processos.add(coordenador);
+
+		criaProcesso(40000); // 40s
+		matarCoordenador(60000); // 60s
+		processaRecurso(numeroAleatorio.buscaNumeroAleatorio(10000, 25000)); // 10s a 25s
 		timerDoConsole(1000); // 1s
 	}
 
 	private void timerDoConsole(int interval) {
 		timer.scheduleAtFixedRate(new TimerTask() {
 			public void run() {
-				System.out.println(timeCount++ + "s " + mensagem);
+				System.out.println(TEMPO_EXECUTANDO++ + "s " + mensagem);
 				mensagem = "";
 
-				if (timeCount > TEMPO_EXECUCAO) {
+				if (TEMPO_EXECUTANDO > TEMPO_EXECUCAO_TOTAL) {
 					timer.cancel();
 				}
 			}
 		}, 1, interval);
 	}
 
-	private void enviaRequisicao(int interval) {
+	private void processaRecurso(int interval) {
 		timer.scheduleAtFixedRate(new TimerTask() {
 			public void run() {
-				mensagem += "\n ENVIAR REQUISIÇÃO: " + enviaRequisicacao();
-			}
-
-			private String enviaRequisicacao() {
-				if (processos.isEmpty()) {
-					return "Nenhum processo ativo";
+				while (recurso.isEmUso()) {
+					// somente continuará quando não estiver em uso
 				}
 
-				if (idCoordenador == 0) {
-					elegerCoordenador();
-				}
+				if (!fila.isEmpty()) {
+					Processo processo = fila.get(0);
+					fila.remove(0);
+					recurso.setEmUso(true);
+					mensagem += "\n CONSUMIR RECURSO: Início do processo de consumir recurso, processo "
+							+ processo.getId();
 
-				for (Processo processo : processos) {
-					if (processo.isAtivo() && !processo.isCoordernador()) {
-						return "Processo " + processo.getId() + " enviando requisição para o Coordenador "
-								+ idCoordenador;
-					}
+					int delayConsumo = numeroAleatorio.buscaNumeroAleatorio(5000, 15000);
+					consumirRecurso(delayConsumo, processo.getId());
 				}
-
-				return "Nenhum processo não coordenador ativo.";
 			}
 		}, interval, interval);
+	}
+
+	private void consumirRecurso(int delay, int id) {
+		timer.scheduleAtFixedRate(new TimerTask() {
+			public void run() {
+				recurso.setEmUso(false);
+				mensagem += "\n CONSUMIR RECURSO: Fim do processo de consumir recurso, processo " + id;
+			}
+		}, delay, 1);
 	}
 
 	private void criaProcesso(int interval) {
 		timer.scheduleAtFixedRate(new TimerTask() {
 			public void run() {
-				idCount++;
-				processos.add(new Processo(idCount, false, true, buscarProcessoAnterior()));
-				mensagem += "\n CRIAR PROCESSO: Criado novo processo " + idCount;
+				int id = numeroAleatorio.buscaIdAleatoriaNaoRepetida();
+				fila.add(new Processo(id, false));
+				mensagem += "\n CRIAR PROCESSO: Criado novo processo " + id;
 			}
 		}, interval, interval);
 	}
 
-	private void inativarProcessoAleatorio(int interval) {
+	private void matarCoordenador(int interval) {
 		timer.scheduleAtFixedRate(new TimerTask() {
 			public void run() {
-				mensagem += "\n INATIVAR PROCESSO: " + inativarProcesso(processos);
-			}
+				mensagem += "\n INATIVAR COORDENADOR: coordenador " + processos.get(indexCoordenador).getId()
+						+ " inativado";
+				processos.get(indexCoordenador).setAtivo(false);
+				fila.clear();
 
-			private String inativarProcesso(List<Processo> list) {
-				if (list.isEmpty()) {
-					return "Nenhum processo encontrado.";
-				}
-
-				for (Processo processo : list) {
-					if (processo.isAtivo() && !processo.isCoordernador()) {
-						processo.setAtivo(false);
-						return "Processo " + processo.getId() + " foi inativado.";
-					}
-				}
-
-				return "Nenhum processo ativo encontrado.";
-			}
-		}, interval, interval);
-	}
-
-	private void inativarCoordenador(int interval) {
-		timer.scheduleAtFixedRate(new TimerTask() {
-			public void run() {
-				mensagem += "\n INATIVAR COORDENADOR: " + inativarCoordenador(processos);
-				idCoordenador = 0;
-			}
-
-			private String inativarCoordenador(List<Processo> list) {
-				if (list.isEmpty()) {
-					return "Nenhum processo encontrado.";
-				}
-
-				for (Processo processo : list) {
-					if (processo.isAtivo() && processo.isCoordernador()) {
-						processo.setAtivo(false);
-						return "Processo Coordenador " + processo.getId() + " foi inativado.";
-					}
-				}
-
-				return "Nenhum processo coordenador ativo encontrado.";
+				elegerCoordenador();
 			}
 		}, interval, interval);
 	}
 
 	private void elegerCoordenador() {
-		Processo processoIdMaior = null;
-		Processo processoAtual = processos.get(processos.size() - 1);
-
-		while (processoAtual.getProxProcesso() != null) {
-			if (processoAtual.isAtivo()
-					&& (processoIdMaior == null || processoAtual.getId() > processoIdMaior.getId())) {
-				processoIdMaior = processoAtual;
+		// Não especificado qual o tipo de eleição no problema.
+		// Buscamos o maior ID para ser o coordenador.
+		for (int i = 0; i < processos.size() - 1; i++) {
+			Processo processo = processos.get(i);
+			if (processo.getId() > coordenador.getId()) {
+				coordenador = processo;
+				indexCoordenador = i;
 			}
-			processoAtual = processoAtual.getProxProcesso();
 		}
 
-		if (processoIdMaior == null) {
-			processoIdMaior = processoAtual;
-		}
-
-		processoIdMaior.setCoordernador(true);
-		idCoordenador = processoIdMaior.getId();
-	}
-
-	private Processo buscarProcessoAnterior() {
-		if (processos.isEmpty()) {
-			return null;
-		}
-
-		return processos.get(idCount - 2);
 	}
 
 }

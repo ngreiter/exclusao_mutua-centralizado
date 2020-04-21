@@ -3,27 +3,25 @@ package projeto;
 public class Processo {
 
 	private int id;
-	private boolean isCoordernador;
 	private boolean ativo;
-	private Processo proxProcesso;
+	private boolean isCoordernador;
 
-	public Processo(int id, boolean isCoordernador, boolean ativo, Processo proxProcesso) {
+	public Processo(int id, boolean isCoordernador) {
 		this.id = id;
+		this.ativo = true;
 		this.isCoordernador = isCoordernador;
-		this.ativo = ativo;
-		this.proxProcesso = proxProcesso;
-	}
-
-	public Processo getProxProcesso() {
-		return proxProcesso;
-	}
-
-	public void setProxProcesso(Processo proxProcesso) {
-		this.proxProcesso = proxProcesso;
 	}
 
 	public Processo() {
 		// Auto-generated constructor stub
+	}
+
+	public boolean isAtivo() {
+		return ativo;
+	}
+
+	public void setAtivo(boolean ativo) {
+		this.ativo = ativo;
 	}
 
 	public int getId() {
@@ -40,14 +38,6 @@ public class Processo {
 
 	public void setCoordernador(boolean isCoordernador) {
 		this.isCoordernador = isCoordernador;
-	}
-
-	public boolean isAtivo() {
-		return ativo;
-	}
-
-	public void setAtivo(boolean ativo) {
-		this.ativo = ativo;
 	}
 
 }
