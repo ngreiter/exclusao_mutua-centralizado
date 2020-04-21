@@ -2,8 +2,7 @@
 
 Alunos: Nathan G. Reiter, Leonardo R. Conceição, Jéssica A. Steinback
 
-Implementar os algoritmos de Exclusão Mútua conforme estudados em sala de aula. Em específico,
-a equipe deve focar no desenvolvimento do algoritmo Centralizado.
+Objetivo: Implementar os algoritmos de Exclusão Mútua conforme estudados em sala de aula. Em específico, a equipe deve focar no desenvolvimento do algoritmo Centralizado.
 
 Especificação:
 ▪ a cada 1 minuto o coordenador morre
@@ -13,10 +12,8 @@ Especificação:
 ▪ a cada 40 segundos um novo processo deve ser criado (ID randômico)
 ▪ dois processos não podem ter o mesmo ID
 
-Você deve gravar um vídeo demonstrando a execução do algoritmo, assim como, mostrar e
-comentar das partes principais da implementação.
+Apresentação: Gravar um vídeo demonstrando a execução do algoritmo, assim como, mostrar e comentar das partes principais da implementação.
 
-Observações:
-1. o trabalho pode ter no máximo 3 (três) integrantes
+Observações:1. o trabalho pode ter no máximo 3 (três) integrantes
 2. os programas-fonte e o vídeo (link) devem ser postados no AVA
 3. a data de entrega é 21/04/2020
