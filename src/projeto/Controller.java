@@ -61,23 +61,28 @@ public class Controller {
 					mensagem += "\n CONSUMIR RECURSO: Início do processo de consumir recurso, processo "
 							+ processo.getId();
 
-					int delayConsumo = numeroAleatorio.buscaNumeroAleatorio(5000, 15000);
-					consumirRecurso(delayConsumo, processo.getId());
+					new Thread(() -> {
+						int delayConsumo = numeroAleatorio.buscaNumeroAleatorio(5000, 15000);
+
+						try {
+							Thread.sleep(delayConsumo);
+						} catch (InterruptedException e) {
+							e.printStackTrace();
+						}
+
+						if (recurso.isEmUso()) {
+							// Caso o coordenador seja desligado, deve ser retirado o processo operante.
+							mensagem += "\n CONSUMIR RECURSO: Fim do processo de consumir recurso, processo "
+									+ processo.getId();
+							recurso.setEmUso(false);
+						}
+					}).run();
 				}
 			}
 		}, interval, interval);
 	}
 
-	private void consumirRecurso(int delay, int id) {
-		timer.scheduleAtFixedRate(new TimerTask() {
-			public void run() {
-				recurso.setEmUso(false);
-				mensagem += "\n CONSUMIR RECURSO: Fim do processo de consumir recurso, processo " + id;
-			}
-		}, delay, 1);
-	}
-
-	private void criaProcesso(int interval) {
+	private void criaProcesso(int interval) { // TODO alterar isso
 		timer.scheduleAtFixedRate(new TimerTask() {
 			public void run() {
 				int id = numeroAleatorio.buscaIdAleatoriaNaoRepetida();
@@ -91,9 +96,14 @@ public class Controller {
 		timer.scheduleAtFixedRate(new TimerTask() {
 			public void run() {
 				mensagem += "\n INATIVAR COORDENADOR: coordenador " + processos.get(indexCoordenador).getId()
-						+ " inativado";
+						+ " inativado, fila limpa";
 				processos.get(indexCoordenador).setAtivo(false);
 				fila.clear();
+
+				if (recurso.isEmUso()) {
+					mensagem += "\n CONSUMIR RECURSO: Consumo de recurso cancelado";
+					recurso.setEmUso(false);
+				}
 
 				elegerCoordenador();
 			}
