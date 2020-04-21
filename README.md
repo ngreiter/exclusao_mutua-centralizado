@@ -1,5 +1,7 @@
 # Exclusão Mútua - Centralizado
 
+Alunos: Nathan G. Reiter, Leonardo R. Conceição, Jéssica A. Steinback
+
 Implementar os algoritmos de Exclusão Mútua conforme estudados em sala de aula. Em específico,
 a equipe deve focar no desenvolvimento do algoritmo Centralizado.
 
