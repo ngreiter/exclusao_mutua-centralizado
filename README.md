@@ -14,6 +14,7 @@ Especificação:
 
 Apresentação: Gravar um vídeo demonstrando a execução do algoritmo, assim como, mostrar e comentar das partes principais da implementação.
 
-Observações:1. o trabalho pode ter no máximo 3 (três) integrantes
+Observações:
+1. o trabalho pode ter no máximo 3 (três) integrantes
 2. os programas-fonte e o vídeo (link) devem ser postados no AVA
 3. a data de entrega é 21/04/2020
