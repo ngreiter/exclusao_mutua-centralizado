@@ -62,7 +62,7 @@ public class Controller {
 							+ processo.getId();
 
 					new Thread(() -> {
-						int delayConsumo = numeroAleatorio.buscaNumeroAleatorio(5000, 15000);
+						Integer delayConsumo = numeroAleatorio.buscaNumeroAleatorio(5000, 15000);
 
 						try {
 							Thread.sleep(delayConsumo);
@@ -73,7 +73,10 @@ public class Controller {
 						if (recurso.isEmUso()) {
 							// Caso o coordenador seja desligado, deve ser retirado o processo operante.
 							mensagem += "\n CONSUMIR RECURSO: Fim do processo de consumir recurso, processo "
-									+ processo.getId();
+									+ processo.getId() + ", em " //
+									+ (delayConsumo.toString().length() == 4 ? delayConsumo.toString().substring(0, 1)
+											: delayConsumo.toString().substring(0, 2))
+									+ " segundos";
 							recurso.setEmUso(false);
 						}
 					}).run();
@@ -82,11 +85,13 @@ public class Controller {
 		}, interval, interval);
 	}
 
-	private void criaProcesso(int interval) { // TODO alterar isso
+	private void criaProcesso(int interval) {
 		timer.scheduleAtFixedRate(new TimerTask() {
 			public void run() {
 				int id = numeroAleatorio.buscaIdAleatoriaNaoRepetida();
-				fila.add(new Processo(id, false));
+				Processo novoProcesso = new Processo(id, false);
+				fila.add(novoProcesso);
+				processos.add(novoProcesso);
 				mensagem += "\n CRIAR PROCESSO: Criado novo processo " + id;
 			}
 		}, interval, interval);
@@ -114,8 +119,8 @@ public class Controller {
 		// Não especificado qual o tipo de eleição no problema.
 		// Buscamos o maior ID para ser o coordenador.
 		for (int i = 0; i < processos.size() - 1; i++) {
-			Processo processo = processos.get(i);
-			if (processo.getId() > coordenador.getId()) {
+			Processo processo = new Processo(0, false);
+			if (processo.isAtivo() && processo.getId() > coordenador.getId()) {
 				coordenador = processo;
 				indexCoordenador = i;
 			}
