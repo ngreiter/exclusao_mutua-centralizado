@@ -1,20 +1,14 @@
-# Exclusão Mútua - Centralizado
+# SincronizacaoRelogio
 
-Alunos: Nathan G. Reiter, Leonardo R. Conceição, Jéssica A. Steinback
+Algoritmo usado para a sincronização interna de um grupo de computadores.
+- "Servidor de tempo" é ativo (master) e coleta os valores de relógios de outros (slaves).
+- Master usa estimativas para estimar o valor dos relógios dos computadores dentro dos grupos.
+- Hora atual é resultante de uma média.
+- Master envia ao slaves o total de tempo em que os relógios devem adiantar/atrasar.
+- Caso o master falhe, um novo computador master é eleito.
 
-Objetivo: Implementar os algoritmos de Exclusão Mútua conforme estudados em sala de aula. Em específico, a equipe deve focar no desenvolvimento do algoritmo Centralizado.
-
-Especificação:
-- a cada 1 minuto o coordenador morre.
-- quando o coordenador morre, a fila também morre.
-- o tempo de processamento de um recurso é de 5 à 15 segundos.
-- os processos tentam consumir o(s) recurso(s) num intervalo de 10 à 25 segundos.
-- a cada 40 segundos um novo processo deve ser criado (ID randômico).
-- dois processos não podem ter o mesmo ID.
-
-Apresentação: Gravar um vídeo demonstrando a execução do algoritmo, assim como, mostrar e comentar das partes principais da implementação.
-
-Observações:
-1. o trabalho pode ter no máximo 3 (três) integrantes
-2. os programas-fonte e o vídeo (link) devem ser postados no AVA
-3. a data de entrega é 21/04/2020
+1. Servidor solicita a hora dos clientes
+2. Cada cliente responde ao servidor informando qual é a diferença de tempo em relação a ele
+3. O servidor efetua a média dos tempos (incluindo a leitura dele).
+4. O  servidor encaminha o ajuste necessário a ser feito pelo cliente (média  + inversão  da diferença de tempo enviada no passo 2. 
+5.Cliente realiza o ajuste.
